@@ -1,0 +1,58 @@
+"""The documentation must describe the tool that exists: flags, exit codes and models."""
+
+import re
+from pathlib import Path
+
+import pytest
+
+from transcribe_media import cli, errors
+from transcribe_media.cloud import settings
+
+ROOT = Path(__file__).resolve().parent.parent
+DOCS = {name: (ROOT / name).read_text(encoding="utf-8") for name in ("README.md", "SKILL.md")}
+# Options of scripts/setup.py, and of other programs the docs mention.
+OTHER_PROGRAMS = {"--diarization", "--no-diarization", "--cloud", "--no-cloud", "--cpu", "--dry-run",
+                  "--version", "--help", "--index-url"}
+
+
+def parser_options():
+    return {opt for action in cli.build_parser()._actions for opt in action.option_strings if opt.startswith("--")}
+
+
+@pytest.mark.parametrize("name", DOCS)
+def test_every_option_the_docs_mention_exists(name):
+    # "--cloud-*" is a family written as a wildcard, not an option
+    mentioned = set(re.findall(r"(?<![\w-])--[a-z][a-z0-9-]*[a-z0-9](?![\w*-])", DOCS[name]))
+    unknown = mentioned - parser_options() - OTHER_PROGRAMS
+    assert not unknown, f"{name} mentions options that do not exist: {sorted(unknown)}"
+
+
+def test_the_exit_codes_in_the_skill_match_the_code():
+    line = re.search(r"Exit codes:(.*?)\n\n", DOCS["SKILL.md"], re.S).group(1)
+    documented = {int(code) for code in re.findall(r"`(\d+)`", line)}
+    in_code = {cls.exit_code for cls in errors.TranscribeMediaError.__subclasses__()}
+    assert in_code <= documented, f"undocumented exit codes: {sorted(in_code - documented)}"
+    assert documented - in_code <= {0, 1, 15, 16, 130}  # success, --check, launcher setup codes, interrupted
+
+
+def test_the_launchers_own_exit_codes_are_documented():
+    launcher = (ROOT / "scripts" / "transcribe.py").read_text(encoding="utf-8")
+    codes = {int(code) for code in re.findall(r"^(?:EXIT_\w+|INTERRUPTED) = (\d+)", launcher, re.M)}
+    assert codes >= {15, 16, 130}
+    line = re.search(r"Exit codes:(.*?)\n\n", DOCS["SKILL.md"], re.S).group(1)
+    documented = {int(code) for code in re.findall(r"`(\d+)`", line)}
+    assert codes <= documented, f"undocumented launcher exit codes: {sorted(codes - documented)}"
+
+
+def test_every_gpu_the_docs_offer_is_allowed():
+    allowed = set(settings.ALLOWED_GPUS)
+    for gpu in re.findall(r"`(T4|L4|A10|L40S|A100|H100)`", DOCS["SKILL.md"]):
+        assert gpu in allowed
+
+
+def test_the_default_cloud_cap_in_the_docs_is_the_real_one():
+    from transcribe_media.backends.modal_backend import DEFAULT_MAX_MINUTES
+
+    for text in DOCS.values():
+        assert f"default {DEFAULT_MAX_MINUTES}" in text
+    assert f"at most {settings.MAX_JOB_SECONDS // 60}" in DOCS["SKILL.md"]

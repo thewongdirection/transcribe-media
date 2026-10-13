@@ -1,0 +1,67 @@
+# Python
+.coverage
+htmlcov/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+
+# Environments and caches
+.venv/
+venv/
+.cache/
+
+# Secrets and credentials - never commit
+.env
+.env.*
+*.token
+token
+.netrc
+*.pem
+*.key
+id_rsa*
+.modal.toml
+.claude/
+id_ed25519*
+credentials*.json
+cookies*.txt
+cookies*.json
+Cookies
+*.sqlite
+
+# Media, models and generated output
+*.wav
+*.mp3
+*.m4a
+*.aac
+*.wma
+*.flac
+*.opus
+*.ogg
+*.mp4
+*.mkv
+*.webm
+*.mov
+*.avi
+*.ts
+*.m3u8
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.npz
+*.pkl
+*.gguf
+*.safetensors
+*.onnx
+*.json3
+*.tmp
+*.probe
+*.log
+# The tool's own output files
+*.transcript.*
+*.youtube-*.txt
+transcripts/
