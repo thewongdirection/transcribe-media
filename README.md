@@ -184,4 +184,11 @@ where available. Live checks (a real transcription, YouTube metadata and caption
 * Two runs at the same time are not coordinated: both can pick the same output name before either has written it.
   Files are replaced atomically, so one result wins and none is half-written. A recording is read into memory as
   16 kHz audio, peaking at roughly 350 MB per hour of audio, so the 10-hour default limit can need several GB.
-* Single videos only (playlists are refused). No license file is included yet.
+* Single videos only (playlists are refused).
+
+## License
+
+[MIT](LICENSE). The models and libraries this tool downloads and uses (Whisper weights, pyannote community-1,
+faster-whisper, yt-dlp and others) keep their own licenses and terms, which apply to your use of them; the
+speaker-label model additionally asks you to accept its terms on Hugging Face. The media you transcribe is
+yours to use only as far as its rights holders allow.

@@ -56,3 +56,13 @@ def test_the_default_cloud_cap_in_the_docs_is_the_real_one():
     for text in DOCS.values():
         assert f"default {DEFAULT_MAX_MINUTES}" in text
     assert f"at most {settings.MAX_JOB_SECONDS // 60}" in DOCS["SKILL.md"]
+
+
+def test_the_license_file_matches_the_declared_license():
+    tomllib = pytest.importorskip("tomllib")  # Python 3.11+; the project itself supports 3.10
+
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+    license_text = (ROOT / "LICENSE").read_text(encoding="utf-8")
+    assert project["license"] == "MIT" and project["license-files"] == ["LICENSE"]
+    assert license_text.startswith("MIT License\n") and "Permission is hereby granted, free of charge" in license_text
+    assert "[MIT](LICENSE)" in DOCS["README.md"] and "No license file" not in DOCS["README.md"]

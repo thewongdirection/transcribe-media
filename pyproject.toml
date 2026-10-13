@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]  # 77 added the SPDX license expression below
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,6 +7,8 @@ name = "transcribe-media"
 version = "0.1.0"
 description = "Accuracy-first local transcription for audio, video and URLs, with hardware-aware model selection"
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.10"
 dependencies = [
     "faster-whisper>=1.2.1,<2",
