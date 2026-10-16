@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=77"]  # 77 added the SPDX license expression below
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "transcribe-media"
+version = "0.1.0"
+description = "Accuracy-first local transcription for audio, video and URLs, with hardware-aware model selection"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+dependencies = [
+    "faster-whisper>=1.2.1,<2",
+    "huggingface-hub>=0.28,<3",
+    # YouTube changes constantly, so only a minimum is set: old yt-dlp versions stop working.
+    "yt-dlp[default]>=2026.8.19",
+]
+
+[project.optional-dependencies]
+# CUDA 12.8+ runtime libraries for CTranslate2 (required for Blackwell, e.g. RTX 50-series).
+gpu = [
+    "nvidia-cublas-cu12>=12.8,<13; sys_platform == 'linux' or sys_platform == 'win32'",
+    "nvidia-cudnn-cu12>=9,<10; sys_platform == 'linux' or sys_platform == 'win32'",
+]
+# Speaker diarization (pyannote community-1). PyTorch itself is installed by
+# scripts/setup.py from the index that matches the detected hardware.
+diarize = ["pyannote.audio>=4.0.7,<5"]
+# Rent a cloud GPU (Modal). Only used when you opt in with --backend modal or auto.
+cloud = ["modal>=1.6,<2"]
+dev = ["pytest>=8", "modal>=1.6,<2"]
+
+[project.scripts]
+transcribe-media = "transcribe_media.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["transcribe_media*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "B", "UP"]
+ignore = ["UP035"]  # typing.Iterator etc. are fine; collections.abc imports add churn only
