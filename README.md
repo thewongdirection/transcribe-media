@@ -14,11 +14,20 @@ By default audio never leaves your machine: the only network use is downloading 
 and fetching the video itself when you give a URL. It also runs inside cloud sessions and can rent a
 cloud GPU when you explicitly ask it to (see [Cloud GPU](#cloud-gpu)).
 
-## Install as a skill
+## Install
 
-Put this folder where Claude Code looks for skills, for example `~/.claude/skills/transcribe-media`.
-Claude reads [`SKILL.md`](SKILL.md). The first run creates a private environment (outside this
-folder) and downloads the model; you can also do that up front:
+This repository is a Claude Code plugin whose one skill ([`SKILL.md`](skills/transcribe-media/SKILL.md))
+tells Claude how to run the tool. Install it from the marketplace:
+
+```
+/plugin marketplace add thewongdirection/the-wong-marketplace
+/plugin install transcribe-media@the-wong-marketplace
+```
+
+Or try a clone without installing it: `claude --plugin-dir /path/to/transcribe-media`.
+
+The first run creates a private environment (outside the plugin folder, so plugin updates do not touch
+it) and downloads the model; you can also do that up front, from the plugin folder or a clone:
 
 ```bash
 python scripts/setup.py            # detects hardware, installs only what it needs

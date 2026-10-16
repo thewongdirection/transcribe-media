@@ -9,10 +9,13 @@ from transcribe_media import cli, errors
 from transcribe_media.cloud import settings
 
 ROOT = Path(__file__).resolve().parent.parent
-DOCS = {name: (ROOT / name).read_text(encoding="utf-8") for name in ("README.md", "SKILL.md")}
+DOCS = {
+    "README.md": (ROOT / "README.md").read_text(encoding="utf-8"),
+    "SKILL.md": (ROOT / "skills" / "transcribe-media" / "SKILL.md").read_text(encoding="utf-8"),
+}
 # Options of scripts/setup.py, and of other programs the docs mention.
 OTHER_PROGRAMS = {"--diarization", "--no-diarization", "--cloud", "--no-cloud", "--cpu", "--dry-run",
-                  "--version", "--help", "--index-url"}
+                  "--version", "--help", "--index-url", "--plugin-dir"}
 
 
 def parser_options():
@@ -66,3 +69,26 @@ def test_the_license_file_matches_the_declared_license():
     assert project["license"] == "MIT" and project["license-files"] == ["LICENSE"]
     assert license_text.startswith("MIT License\n") and "Permission is hereby granted, free of charge" in license_text
     assert "[MIT](LICENSE)" in DOCS["README.md"] and "No license file" not in DOCS["README.md"]
+
+
+# --- the plugin packaging ------------------------------------------------------------------------------------ #
+
+def test_the_plugin_manifest_agrees_with_the_package_and_the_skill():
+    import json
+
+    tomllib = pytest.importorskip("tomllib")  # Python 3.11+
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+    manifest = json.loads((ROOT / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
+    assert manifest["name"] == "transcribe-media" == project["name"]
+    assert manifest["version"] == project["version"] and manifest["license"] == project["license"]
+    skill = DOCS["SKILL.md"]
+    assert skill.startswith("---\nname: transcribe-media\n")
+
+
+def test_the_skill_finds_the_scripts_from_inside_the_plugin_layout():
+    skill_dir = ROOT / "skills" / "transcribe-media"
+    commands = re.findall(r'python "\$\{CLAUDE_SKILL_DIR\}/([^"]+)"', DOCS["SKILL.md"])
+    assert commands, "the skill should run its scripts through ${CLAUDE_SKILL_DIR}"
+    for relative in commands:
+        assert (skill_dir / relative).is_file(), relative
+    assert "<skill-dir>" not in DOCS["SKILL.md"]

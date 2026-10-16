@@ -13,8 +13,12 @@ when the user opts in (see "Cloud sessions and cloud GPUs").
 
 ## Run it
 
+The scripts live two folders above this file, in the plugin's `scripts/` folder; the path below
+uses `${CLAUDE_SKILL_DIR}` so it works wherever the plugin is installed. Every `scripts/...` name
+later in this document means the same folder.
+
 ```bash
-python <skill-dir>/scripts/transcribe.py "<file-or-url>" [options]
+python "${CLAUDE_SKILL_DIR}/../../scripts/transcribe.py" "<file-or-url>" [options]
 ```
 
 - Pass the user's path or URL as **one quoted argument**. Never build the command by
@@ -56,7 +60,7 @@ in their own environment. After the first download no token is needed.
   line of the summary explains why. Do not treat that as a failure. `--diarize on` is the
   exception: it checks first and stops before transcribing, so no work is wasted.
 - Never ask the user to paste a token into the chat, and never print or log one.
-- If the packages are missing, `python <skill-dir>/scripts/setup.py --diarization`
+- If the packages are missing, `python "${CLAUDE_SKILL_DIR}/../../scripts/setup.py" --diarization`
   installs them. Use `--diarize on` only if the user insists on labels (it then errors
   instead of skipping), `--diarize off` to disable, and `--num-speakers N` when known.
 
@@ -93,7 +97,7 @@ free Modal account, then either run `modal token new` on their own machine or, f
 session, add `MODAL_TOKEN_ID` and `MODAL_TOKEN_SECRET` in the environment's settings (under
 network secrets or environment variables) and allow Modal's hosts in the environment's
 network access (`*.modal.com`; an error names any other host that is blocked). Then
-`python <skill-dir>/scripts/setup.py --cloud` adds the client, and
+`python "${CLAUDE_SKILL_DIR}/../../scripts/setup.py" --cloud` adds the client, and
 `transcribe.py --self-test --backend modal` verifies the whole chain using a synthetic
 tone only. The first cloud run builds the GPU image and downloads the model, which takes a
 few extra minutes; later runs reuse both.

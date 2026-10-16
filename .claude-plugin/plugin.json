@@ -1,0 +1,12 @@
+{
+  "name": "transcribe-media",
+  "version": "0.1.0",
+  "description": "Accuracy-first transcription of audio, video and URLs (such as YouTube) with Whisper large-v3: hardware-aware model choice, optional speaker labels, and an opt-in cloud GPU.",
+  "author": {
+    "name": "thewongdirection"
+  },
+  "homepage": "https://github.com/thewongdirection/transcribe-media",
+  "repository": "https://github.com/thewongdirection/transcribe-media",
+  "license": "MIT",
+  "keywords": ["transcription", "whisper", "speech-to-text", "youtube", "diarization", "subtitles"]
+}
